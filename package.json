@@ -1,7 +1,7 @@
 {
-  "name": "version-service",
+  "name": "version-tracker",
   "version": "1.0.0",
-  "description": "Version Service",
+  "description": "Version Tracker",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",

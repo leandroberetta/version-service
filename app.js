@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var util = require('util')
 
-mongoose.connect(util.format('mongodb://%s:%s@%s/version', process.env.DB_USERNAME, process.env.DB_PASSWORD, process.env.DB_CONNECTION_URL), {useNewUrlParser: true});
+mongoose.connect(util.format('mongodb://%s:%s@%s/%s', process.env.DB_USERNAME, process.env.DB_PASSWORD, process.env.DB_CONNECTION_URL, process.env.DB_NAME), {useNewUrlParser: true});
 
 var versionSchema = new mongoose.Schema({
     project: String,

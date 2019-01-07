@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: version-tracker
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+    labels:
+      app: version-tracker
+    name: version-tracker
+  spec:
+    replicas: 1
+    selector:
+      app: version-tracker
+      deploymentconfig: version-tracker
+    strategy:
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: version-tracker
+          deploymentconfig: version-tracker
+      spec:
+        containers:
+        - env:
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: mongodb
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: mongodb
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                key: database-name
+                name: mongodb
+          - name: DB_CONNECTION_URL
+            value: mongodb
+          image: version-tracker:latest
+          imagePullPolicy: Always
+          name: version-tracker
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - version-tracker
+        from:
+          kind: ImageStreamTag
+          name: version-tracker:latest
+      type: ImageChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: version-tracker
+    name: version-tracker
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: version-tracker:latest
+    runPolicy: Serial
+    source:
+      git:
+        uri: https://github.com/leandroberetta/version-tracker.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: nodejs:10
+          namespace: openshift
+      type: Source
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: version-tracker
+    name: version-tracker
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: version-tracker
+    name: version-tracker
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: version-tracker
+      deploymentconfig: version-tracker
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: version-tracker
+    name: version-tracker
+  spec:
+    to:
+      kind: Service
+      name: version-tracker
