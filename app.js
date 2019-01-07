@@ -8,7 +8,8 @@ mongoose.connect(util.format('mongodb://%s:%s@%s/%s', process.env.DB_USERNAME, p
 var versionSchema = new mongoose.Schema({
     project: String,
     application: String,
-    version: String
+    version: String,
+    date: {type: Date, default: Date.now}
 });
 
 var Version = mongoose.model('Version', versionSchema);
@@ -22,7 +23,7 @@ app.get('/health', function (req, res) {
 });
 
 app.get('/version/:project', function (req, res) {
-    Version.find({ 'project': req.params.project }, function (err, versions) {
+    Version.find({'project': req.params.project }, function (err, versions) {
         if (err) 
             res.send({'status': '1', 'data': err})
         
@@ -31,7 +32,7 @@ app.get('/version/:project', function (req, res) {
 });
 
 app.delete('/version/:project/:application', function (req, res) {
-    Version.deleteOne({ 'project': req.params.project, 'application': req.params.application }, function (err, versions) {
+    Version.deleteOne({'project': req.params.project, 'application': req.params.application }, function (err, versions) {
         if (err) 
             res.send({'status': '1', 'data': err})
         
@@ -40,7 +41,7 @@ app.delete('/version/:project/:application', function (req, res) {
 });
 
 app.post('/version', function (req, res) {
-    Version.updateOne({ 'project': req.body.project, 'application': req.body.application }, { 'version': req.body.version }, { upsert: true }, function (err, raw) {
+    Version.updateOne({'project': req.body.project, 'application': req.body.application }, { 'version': req.body.version }, { upsert: true }, function (err, raw) {
         if (err) 
             res.send({'status': '1', 'data': err})
     });
