@@ -9,7 +9,7 @@ var versionSchema = new mongoose.Schema({
     project: String,
     application: String,
     version: String,
-    updatedAt: {type: Date, default: Date.now}
+    updatedAt: Date
 });
 
 var Version = mongoose.model('Version', versionSchema);
@@ -41,7 +41,7 @@ app.delete('/version/:project/:application', function (req, res) {
 });
 
 app.post('/version', function (req, res) {
-    Version.updateOne({'project': req.body.project, 'application': req.body.application }, { 'version': req.body.version }, { upsert: true }, function (err, raw) {
+    Version.updateOne({'project': req.body.project, 'application': req.body.application }, { 'version': req.body.version, 'updatedAt': Date.now()}, { upsert: true }, function (err, raw) {
         if (err) 
             res.send({'status': '1', 'data': err})
     });
