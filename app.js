@@ -9,7 +9,7 @@ var versionSchema = new mongoose.Schema({
     project: String,
     application: String,
     version: String,
-    date: {type: Date, default: Date.now}
+    updatedAt: {type: Date, default: Date.now}
 });
 
 var Version = mongoose.model('Version', versionSchema);
