@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var util = require('util')
 
-mongoose.connect(util.format('mongodb://%s/myapp', process.env.DB_CONNECTION_URL), {useNewUrlParser: true});
+mongoose.connect(util.format('mongodb://admin:redhat01@mongodb/version', process.env.DB_CONNECTION_URL), {useNewUrlParser: true});
 
 var db = mongoose.connection;
 
