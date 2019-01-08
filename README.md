@@ -6,7 +6,7 @@ Application to facilitate the tracking of microservices versions in use.
 
 Create a project
 
-    oc new-project version-tracker
+    oc new-project tools
 
 Create the MongoDB instance
 

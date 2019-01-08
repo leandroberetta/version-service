@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  labels:
+  name: version-tracker-test-pipeline
+spec:
+  strategy:
+    jenkinsPipelineStrategy:
+      env:
+      jenkinsfile: |-
+        pipeline {
+            agent any
+            options { 
+                skipDefaultCheckout()
+                disableConcurrentBuilds()
+            }
+            stages {
+                stage("Set Version Tracker URL") {
+                    steps {
+                        script {
+                            env.VERSION_TRACKER_URL = input(id: 'versionTrackerURL', message: 'Version Tracker URL', parameters: [string(defaultValue: '', description: 'Version Tracker URL', name: 'Version Tracker URL', trim: true)])
+                        }
+                    }
+                }
+                stage("Set Project") {
+                    steps {
+                        script {
+                            env.PROJECT = input(id: 'project', message: 'Project', parameters: [string(defaultValue: '', description: 'Project', name: 'Project', trim: true)])
+                        }
+                    }
+                }
+                stage("Set Application") {
+                    steps {
+                        script {
+                            env.APPLICATION = input(id: 'application', message: 'Application', parameters: [string(defaultValue: '', description: 'Application', name: 'Application', trim: true)])
+                        }
+                    }
+                }
+                stage("Set Version") {
+                    steps {
+                        script {
+                            env.VERSION = input(id: 'version', message: 'Version', parameters: [string(defaultValue: '', description: 'Version', name: 'Version', trim: true)])
+                        }
+                    }
+                }
+                stage("Release Version") {
+                    steps {
+                        sh "curl --header \"Content-Type: application/json\" --request POST --data '{\"project\":\"$PROJECT\",\"application\":\"$APPLICATION\",\"version\": \"$VERSION\"}' $VERSION_TRACKER_URL"
+                    }
+                }
+            }
+        }
+    type: JenkinsPipeline
